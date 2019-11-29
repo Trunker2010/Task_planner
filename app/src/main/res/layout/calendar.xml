@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent" android:layout_width="match_parent">
+    <com.applandeo.materialcalendarview.CalendarView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/calendar"
+        app:type="one_day_picker"
+        app:eventsEnabled="true"
+        
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.applandeo.materialcalendarview.CalendarView>
+</LinearLayout>
+
