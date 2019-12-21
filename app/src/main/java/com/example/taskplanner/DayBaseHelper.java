@@ -22,6 +22,7 @@ public class DayBaseHelper extends SQLiteOpenHelper {
                 DayTable.Cols.ID + " INTEGER primary key autoincrement," +
                 DayTable.Cols.UUID + ", " +
                 DayTable.Cols.DATE + ", " +
+                DayTable.Cols.HAS_NOTIFICATION + "  INTEGER NOT NULL"+", "+
                 DayTable.Cols.HAS_TASKS + "  INTEGER NOT NULL" +
                 ")"
         );

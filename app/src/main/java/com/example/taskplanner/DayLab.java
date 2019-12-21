@@ -1,7 +1,10 @@
 package com.example.taskplanner;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
@@ -10,12 +13,21 @@ import com.example.taskplanner.DayDbScheme.DayTable;
 import com.example.taskplanner.DayDbScheme.TaskTable;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DayLab {
 
     private Context mContext;
     private SQLiteDatabase mDatabase;
+    public static final String EXTRA_DATE = "date";
+    private static final String EXTRA_DAY_ID = "day_id";
+    private AlarmManager mAlarmManager;
+    ContentValues mHasNotificationMark = new ContentValues();
 
     public static Day getDayByID(int id) {
         return null;
@@ -25,7 +37,7 @@ public class DayLab {
     public DayLab(Context context) {
         mContext = context.getApplicationContext();
         mDatabase = new DayBaseHelper(mContext).getWritableDatabase();
-
+        mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
     }
 
@@ -34,6 +46,7 @@ public class DayLab {
         values.put(DayTable.Cols.UUID, day.getId());
         values.put(DayTable.Cols.DATE, day.getDate());
         values.put(DayTable.Cols.HAS_TASKS, 0);
+        values.put(DayTable.Cols.HAS_NOTIFICATION, 0);
         return values;
     }
 
@@ -124,16 +137,32 @@ public class DayLab {
         return days;
     }
 
-    public void checkForTasks(Day day) {
-        Cursor cursor = mDatabase.query(TaskTable.NAME, new String[]{TaskTable.Cols.DAY_ID}, TaskTable.Cols.DAY_ID +" =?", new String[]{String.valueOf(day.getId())}, null, null, null);
+    public boolean checkForTasks(Day day) {
+        Cursor cursor = mDatabase.query(TaskTable.NAME, new String[]{TaskTable.Cols.DAY_ID}, TaskTable.Cols.DAY_ID + " =?", new String[]{String.valueOf(day.getId())}, null, null, null);
         cursor.moveToFirst();
         if (cursor.getCount() == 0) {
             ContentValues values = new ContentValues();
             values.put(DayTable.Cols.HAS_TASKS, 0);
             mDatabase.update(DayTable.NAME, values, DayTable.Cols.ID + " =?", new String[]{String.valueOf(day.getId())});
             values.clear();
+            return false;
+
         }
         cursor.close();
+        return true;
+    }
+
+    public boolean checkForNotification(Day day) {
+        Cursor cursor = mDatabase.query(DayTable.NAME, new String[]{DayTable.Cols.HAS_NOTIFICATION}, DayTable.Cols.ID + " =?", new String[]{String.valueOf(day.getId())}, null, null, null);
+        cursor.moveToFirst();
+        int h = cursor.getInt(cursor.getColumnIndex(DayTable.Cols.HAS_NOTIFICATION));
+        if (cursor.getInt(cursor.getColumnIndex(DayTable.Cols.HAS_NOTIFICATION)) == 1) {
+            cursor.close();
+            return true;
+
+        } else
+            cursor.close();
+        return false;
     }
 
 
@@ -191,5 +220,72 @@ public class DayLab {
         values.put(TaskTable.Cols.TASK, newTask);
         mDatabase.update(TaskTable.NAME, values, TaskTable.Cols.ID + " =?", new String[]{String.valueOf(task.getId())});
 
+    }
+
+    public void setNotification() {
+        ArrayList<Day> DaysWithTasks = getDaysWithTaskFromDB();
+
+        for (Day day : DaysWithTasks) {
+            if (!checkForNotification(day)) {
+                markDayNotification(day, true);
+                createAlarm(day);
+            }
+
+
+        }
+
+    }
+
+    public void rebuildNotification() {
+        ArrayList<Day> DaysWithTasks = getDaysWithTaskFromDB();
+
+        for (Day day : DaysWithTasks) {
+            if (checkForNotification(day)) {
+                createAlarm(day);
+            }
+
+
+        }
+    }
+
+    private void createAlarm(Day day) {
+        String dateStr = day.getDate();
+        Calendar calendar = new GregorianCalendar();
+        int dayId = day.getId();
+        try {
+            Date date = new SimpleDateFormat(DaysListFragment.DATE_PATTERN).parse(dateStr);
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Intent notifyIntent = new Intent(mContext, NotificationReceiver.class);
+        notifyIntent.putExtra(DayTasksActivity.EXTRA_DAY_ID, dayId);
+
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, day.getId(),
+                notifyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +10000, pendingIntent);
+    }
+
+    public void markDayNotification(Day day, Boolean hasNotification) {
+        if (hasNotification) {
+            mHasNotificationMark.put(DayTable.Cols.HAS_NOTIFICATION, 1);
+        } else {
+            mHasNotificationMark.put(DayTable.Cols.HAS_NOTIFICATION, 0);
+        }
+        mDatabase.update(DayTable.NAME, mHasNotificationMark, DayTable.Cols.ID + " =?", new String[]{String.valueOf(day.getId())});
+        mHasNotificationMark.clear();
+
+    }
+
+    public void cancelNotification(Day day) {
+
+        Intent notifyIntent = new Intent(mContext, NotificationReceiver.class);
+        markDayNotification(day, false);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, day.getId(),
+
+                notifyIntent, PendingIntent.FLAG_ONE_SHOT);
+
+        mAlarmManager.cancel(pendingIntent);
     }
 }

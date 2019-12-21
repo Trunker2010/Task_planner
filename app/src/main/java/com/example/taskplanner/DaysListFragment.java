@@ -61,7 +61,7 @@ public class DaysListFragment extends Fragment {
     };
 
     public static Fragment newInstance() {
-        DaysListFragment fragment  = new DaysListFragment();
+        DaysListFragment fragment = new DaysListFragment();
         return fragment;
     }
 
@@ -134,7 +134,7 @@ public class DaysListFragment extends Fragment {
                     mDayLab.RemoveDay(mDay.getId());
                     updateRecyclerView();
                     mDayLab.checkForTasks(mDay);
-
+                    mDayLab.cancelNotification(mDay);
                     return;
 
             }

@@ -9,6 +9,7 @@ public class DayDbScheme {
             public static final String UUID = "uuid";
             public static final String DATE = "date";
             public static final String HAS_TASKS = "has_task";
+            public static final String HAS_NOTIFICATION = "has_notification";
         }
     }
 

@@ -42,16 +42,9 @@ public class CalendarFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    //фйывыфвфыв
-    //asdsdad
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
-        View view = inflater.inflate(R.layout.calendar, container, false);
-        mCalendarView = view.findViewById(R.id.calendar);
-
+    public void onResume() {
+        super.onResume();
         ArrayList<Day> days = mDayLab.getDaysWithTaskFromDB();
         mCalendarView.setOnDayClickListener(new OnDayClickListener() {
             @Override
@@ -74,8 +67,21 @@ public class CalendarFragment extends Fragment {
         });
 
 
+
         mCalendarView.setEvents(createEvents(days));
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+
+        View view = inflater.inflate(R.layout.calendar, container, false);
+        mCalendarView = view.findViewById(R.id.calendar);
         return view;
+
+
     }
 
 

@@ -1,6 +1,9 @@
 package com.example.taskplanner;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,13 +24,21 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DayTaskFragment extends Fragment {
 
+    //public static final String DAY_TAG = "day_id";
+    public static final String EXTRA_DATE = "date";
+    private static final String EXTRA_DAY_ID = "day_id";
     RecyclerView mTaskRecyclerView;
     Day mDay;
-    TextView mTextView;
+
     TaskAdapter mTaskAdapter;
     ArrayList<Task> mTasksList;
     DayLab mDayLab;
@@ -35,14 +46,16 @@ public class DayTaskFragment extends Fragment {
     Button addTaskBTN;
     TextView dateTV;
     ScrollView scrollView;
+    AlarmManager alarmManager;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String dayId = String.valueOf(getActivity().getIntent().getIntExtra(DayTasksActivity.EXTRA_CREME_ID, 0));
+        String dayId = String.valueOf(getActivity().getIntent().getIntExtra(DayTasksActivity.EXTRA_DAY_ID, 0));
         mDayLab = new DayLab(getContext());
         mDay = mDayLab.dbToDay(dayId);
-
+//        alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         setHasOptionsMenu(true);
 
         getActivity().setTitle(mDay.getDate());
@@ -141,6 +154,9 @@ public class DayTaskFragment extends Fragment {
                 case R.id.removeTaskBtn:
                     mDayLab.RemoveTask(mTask.getId());
                     mDayLab.checkForTasks(mDay);
+                    if (!mDayLab.checkForTasks(mDay)) {
+                        mDayLab.cancelNotification(mDay);
+                    }
                     updateRecyclerView();
                     return;
                 case R.id.editTaskButton:
@@ -168,6 +184,12 @@ public class DayTaskFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.day_task_fragment, menu);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mDayLab.setNotification();
     }
 
     @Override
@@ -207,7 +229,7 @@ public class DayTaskFragment extends Fragment {
         @NonNull
         @Override
         public TaskHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            Context context;
+            // Context context;
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
             return new TaskHolder(inflater, parent);
@@ -228,5 +250,6 @@ public class DayTaskFragment extends Fragment {
             mTasks = tasksList;
         }
     }
+
 
 }
