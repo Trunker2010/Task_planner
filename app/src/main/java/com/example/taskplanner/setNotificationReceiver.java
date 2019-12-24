@@ -20,8 +20,10 @@ public class setNotificationReceiver extends BroadcastReceiver {
         mDayLab = new DayLab(context);
 
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            if (context.getSharedPreferences(SettingsActivity.APP_PREFERENCES,Context.MODE_PRIVATE).getBoolean(SettingsFragment.NOTIFICATION_IS_CHECKED, false)) {
+                mDayLab.rebuildNotification();
+            }
 
-            mDayLab.rebuildNotification();
             Log.d(TAG, "onReceive");
             // ваш код здесь
         }

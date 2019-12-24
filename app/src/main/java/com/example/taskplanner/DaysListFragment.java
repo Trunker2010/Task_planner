@@ -78,7 +78,11 @@ public class DaysListFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-
+                    case R.id.settings: {
+                        Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                        startActivity(intent);
+                        return true;
+                    }
                     default:
                         return true;
                 }

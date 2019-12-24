@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -47,6 +48,7 @@ public class DayTaskFragment extends Fragment {
     TextView dateTV;
     ScrollView scrollView;
     AlarmManager alarmManager;
+    SharedPreferences mSharedPreferences;
 
 
     @Override
@@ -56,6 +58,8 @@ public class DayTaskFragment extends Fragment {
         mDayLab = new DayLab(getContext());
         mDay = mDayLab.dbToDay(dayId);
 //        alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+        mSharedPreferences = getContext().getSharedPreferences(SettingsActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
 
         getActivity().setTitle(mDay.getDate());
@@ -189,7 +193,10 @@ public class DayTaskFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        mDayLab.setNotification();
+        if (mSharedPreferences.getBoolean(SettingsFragment.NOTIFICATION_IS_CHECKED, false)) {
+            mDayLab.setNotification();
+        }
+
     }
 
     @Override

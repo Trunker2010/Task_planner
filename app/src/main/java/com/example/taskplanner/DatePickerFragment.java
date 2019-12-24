@@ -34,14 +34,11 @@ public class DatePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_date, null);
-        Calendar calendar = Calendar.getInstance();
-        Date date = new Date();
 
 
         mDatePicker = (DatePicker) view.findViewById(R.id.dialog_date_picker);
 
 
-        //mDatePicker.init();
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.date_picker_title)

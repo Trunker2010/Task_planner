@@ -5,8 +5,10 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.example.taskplanner.DayDbScheme.DayTable;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 public class DayLab {
 
@@ -251,7 +254,12 @@ public class DayLab {
     private void createAlarm(Day day) {
         String dateStr = day.getDate();
         Calendar calendar = new GregorianCalendar();
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(SettingsActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
+        Long timeInMs = TimeUnit.HOURS.toMillis(sharedPreferences.getLong(SettingsActivity.HOUR_FOR_DAY_NOTIFICATION, 0))
+                + TimeUnit.MINUTES.toMillis(sharedPreferences.getLong(SettingsActivity.MINUTE_FOR_DAY_NOTIFICATION, 0));
+
         int dayId = day.getId();
+
         try {
             Date date = new SimpleDateFormat(DaysListFragment.DATE_PATTERN).parse(dateStr);
             calendar.setTime(date);
@@ -264,7 +272,8 @@ public class DayLab {
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, day.getId(),
                 notifyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +10000, pendingIntent);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + timeInMs, pendingIntent);
+
     }
 
     public void markDayNotification(Day day, Boolean hasNotification) {
@@ -278,14 +287,32 @@ public class DayLab {
 
     }
 
+    public void markDaysNotification(Boolean notify) {
+        ArrayList<Day> DaysWithTasks = getDaysWithTaskFromDB();
+        for (Day day : DaysWithTasks) {
+
+            markDayNotification(day, notify);
+        }
+    }
+
     public void cancelNotification(Day day) {
 
         Intent notifyIntent = new Intent(mContext, NotificationReceiver.class);
         markDayNotification(day, false);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, day.getId(),
 
-                notifyIntent, PendingIntent.FLAG_ONE_SHOT);
+                notifyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         mAlarmManager.cancel(pendingIntent);
+    }
+
+    public void cancelAllNotification() {
+        ArrayList<Day> DaysWithTasks = getDaysWithTaskFromDB();
+
+        for (Day day : DaysWithTasks) {
+            if (checkForNotification(day)) {
+                cancelNotification(day);
+            }
+        }
     }
 }
