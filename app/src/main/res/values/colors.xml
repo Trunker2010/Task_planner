@@ -5,5 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorFab">#FFFFFF</color>
     <color name="rvBackground">#A3A3A3</color>
+    <color name="appBarBackground">#00000000</color>
+
 
 </resources>
