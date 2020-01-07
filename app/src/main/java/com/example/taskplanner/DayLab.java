@@ -148,8 +148,8 @@ public class DayLab {
             values.put(DayTable.Cols.HAS_TASKS, 0);
             mDatabase.update(DayTable.NAME, values, DayTable.Cols.ID + " =?", new String[]{String.valueOf(day.getId())});
             values.clear();
+            cursor.close();
             return false;
-
         }
         cursor.close();
         return true;
@@ -158,7 +158,7 @@ public class DayLab {
     public boolean checkForNotification(Day day) {
         Cursor cursor = mDatabase.query(DayTable.NAME, new String[]{DayTable.Cols.HAS_NOTIFICATION}, DayTable.Cols.ID + " =?", new String[]{String.valueOf(day.getId())}, null, null, null);
         cursor.moveToFirst();
-        int h = cursor.getInt(cursor.getColumnIndex(DayTable.Cols.HAS_NOTIFICATION));
+
         if (cursor.getInt(cursor.getColumnIndex(DayTable.Cols.HAS_NOTIFICATION)) == 1) {
             cursor.close();
             return true;
@@ -308,7 +308,6 @@ public class DayLab {
 
     public void cancelAllNotification() {
         ArrayList<Day> DaysWithTasks = getDaysWithTaskFromDB();
-
         for (Day day : DaysWithTasks) {
             if (checkForNotification(day)) {
                 cancelNotification(day);

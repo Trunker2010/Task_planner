@@ -36,6 +36,11 @@ public class CalendarFragment extends Fragment {
     CalendarView mCalendarView;
     DayLab mDayLab;
 
+    public static Fragment newInstance() {
+        return new CalendarFragment();
+
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         mDayLab = new DayLab(getContext());
@@ -57,15 +62,13 @@ public class CalendarFragment extends Fragment {
                     int id = mDayLab.getIdByDate(dateFormat);
                     Intent intent = DayTasksActivity.newIntent(getActivity(), id);
                     startActivity(intent);
-                }
-                else {
-                    Toast.makeText(getContext(),"Дата не создана",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Дата не создана", Toast.LENGTH_SHORT).show();
                 }
 
 
             }
         });
-
 
 
         mCalendarView.setEvents(createEvents(days));

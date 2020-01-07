@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 import java.lang.annotation.Retention;
 import java.util.Calendar;
@@ -25,11 +26,10 @@ public class DatePickerFragment extends DialogFragment {
     private DatePicker mDatePicker;
     public static final String EXTRA_DATE = "com.example.taskplanner.date";
 
-    private static DatePickerFragment newInstance() {
+    public static DialogFragment newInstance() {
         DatePickerFragment fragment = new DatePickerFragment();
         return fragment;
     }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -50,7 +50,9 @@ public class DatePickerFragment extends DialogFragment {
                         int month =mDatePicker.getMonth();
                         int day = mDatePicker.getDayOfMonth();
                         Date date = new GregorianCalendar(year,month,day).getTime();
+
                         sendResult(Activity.RESULT_OK,date);
+
                     }
                 })
 
@@ -65,5 +67,6 @@ public class DatePickerFragment extends DialogFragment {
         intent.putExtra(EXTRA_DATE, date);
         getTargetFragment().onActivityResult(getTargetRequestCode(),resultCode,intent);
     }
+
 
 }

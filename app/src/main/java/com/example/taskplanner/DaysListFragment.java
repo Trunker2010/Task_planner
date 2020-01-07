@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,12 +29,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
-
 import com.applandeo.materialcalendarview.EventDay;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,7 +42,6 @@ import java.util.List;
 public class DaysListFragment extends Fragment {
     private static final String CALENDAR_TAG = "calendar";
     private RecyclerView mDayRecyclerView;
-
     BottomAppBar mBottomAppBar;
     FloatingActionButton mFloatingActionButton;
     public static final String DIALOG_DATE = "dialogDate";
@@ -54,6 +51,7 @@ public class DaysListFragment extends Fragment {
     DayLab mDayLab;
     ArrayList<Day> days;
     NestedScrollView mNestedScrollView;
+    FrameLayout mFrameLayoutMarcDate;
 
     public static final String DATE_PATTERN = "d MMMM yyyy, E";
 
@@ -70,6 +68,7 @@ public class DaysListFragment extends Fragment {
 
     public static Fragment newInstance() {
         DaysListFragment fragment = new DaysListFragment();
+
         return fragment;
     }
 
@@ -81,45 +80,15 @@ public class DaysListFragment extends Fragment {
         mBottomAppBar = getActivity().findViewById(R.id.bottom_app_bar);
         mCoordinatorLayout = view.findViewById(R.id.days_CoordinatorLayout);
         mNestedScrollView = view.findViewById(R.id.nested_scroll_recycler_view);
-
-
         mFloatingActionButton = getActivity().findViewById(R.id.fab);
-        ViewPager viewPager = getActivity().findViewById(R.id.viewpager);
         mBottomAppBar.performShow();
-
-//        mDayRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                if (dy > 0) {
-//                    mBottomAppBar.performHide();
-//                    mFloatingActionButton.hide();
-//                }
-//
-//                if (dy < 0) {
-//                    mBottomAppBar.performShow();
-//                    mFloatingActionButton.show();
-//
-//                }
-//            }
-//
-//
-//            @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//
-//                super.onScrollStateChanged(recyclerView, newState);
-//            }
-//        });
-
-
-
         mDayRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         updateRecyclerView();
 
         return view;
     }
+
+
 
 
     private class DayHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -127,19 +96,23 @@ public class DaysListFragment extends Fragment {
         Day mDay;
         Button mRemoveMaterialButton;
 
-
         public DayHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.day_item_list, parent, false));
             date = itemView.findViewById(R.id.TVDate);
             mRemoveMaterialButton = itemView.findViewById(R.id.removeButton);
+            mFrameLayoutMarcDate = itemView.findViewById(R.id.marcDate);
             mRemoveMaterialButton.setOnClickListener(this);
             itemView.setOnClickListener(this);
-
         }
 
         public void bind(Day day) {
             mDay = day;
             date.setText(day.getDate());
+            if (mDayLab.checkForTasks(day)){
+                mFrameLayoutMarcDate.setVisibility(View.VISIBLE);
+            }
+            else
+                mFrameLayoutMarcDate.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -151,19 +124,22 @@ public class DaysListFragment extends Fragment {
                     return;
                 case R.id.removeButton:
                     mDayLab.RemoveDay(mDay.getId());
-                    updateRecyclerView();
+
                     mDayLab.checkForTasks(mDay);
                     mDayLab.cancelNotification(mDay);
-
-
                     mBottomAppBar.performShow();
+                    updateRecyclerView();
                     return;
-
             }
 
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateRecyclerView();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -235,20 +211,18 @@ public class DaysListFragment extends Fragment {
         days = mDayLab.getAllDaysFromDB();
         if (mDayAdapter == null) {
             mDayAdapter = new DayAdapter(days);
-            mDayRecyclerView.setAdapter(mDayAdapter);
+
         } else {
+            mDayRecyclerView.setAdapter(mDayAdapter);
             mDayAdapter.setDays(days);
             mDayAdapter.notifyDataSetChanged();
         }
 
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDayLab = new DayLab(getActivity());
     }
-
-
 }
