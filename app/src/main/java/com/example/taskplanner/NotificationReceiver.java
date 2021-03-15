@@ -42,7 +42,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Intent resultIntent = DayTasksActivity.newIntent(context, dayId);
 
-        //resultIntent.putExtra(DayTasksActivity.EXTRA_DAY_ID, dayId);
 
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)

@@ -23,9 +23,6 @@ public class setNotificationReceiver extends BroadcastReceiver {
             if (context.getSharedPreferences(SettingsActivity.APP_PREFERENCES,Context.MODE_PRIVATE).getBoolean(SettingsFragment.NOTIFICATION_IS_CHECKED, false)) {
                 mDayLab.rebuildNotification();
             }
-
-            Log.d(TAG, "onReceive");
-            // ваш код здесь
         }
 
     }

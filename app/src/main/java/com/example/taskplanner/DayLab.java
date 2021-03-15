@@ -106,7 +106,7 @@ public class DayLab {
 
                 day.setId(cursor.getInt(cursor.getColumnIndex(DayTable.Cols.ID)));
                 day.setDate(cursor.getString(cursor.getColumnIndex((DayTable.Cols.DATE))));
-                days.add(0, day);
+                days.add(0,day);
                 cursor.moveToNext();
             }
             while (!cursor.isAfterLast());

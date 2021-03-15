@@ -1,11 +1,16 @@
 package com.example.taskplanner;
 
+
+
+
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
 public class Day {
+  
     private int mId;
     private String mDate;
     private ArrayList<String> mTasks;
@@ -29,14 +34,6 @@ public class Day {
     }
 
 
-//    public void setId(UUID id) {
-//        mId = id;
-//    }
-
-//    public UUID getId() {
-////        return mId;
-////    }
-
 
 
 
@@ -48,7 +45,6 @@ public class Day {
 
 
     public Day() {
-       // mId = mId.randomUUID();
         mTasks = new ArrayList<>();
     }
 
@@ -61,9 +57,6 @@ public class Day {
     }
 
     public String getDate() {
-//        String datePattern = "d MMMM yyyy, E";
-//        String dateFormat = new SimpleDateFormat(datePattern).format(mDate);
-//        return dateFormat;
         return mDate;
     }
 }

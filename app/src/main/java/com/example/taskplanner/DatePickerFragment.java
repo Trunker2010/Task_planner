@@ -27,8 +27,7 @@ public class DatePickerFragment extends DialogFragment {
     public static final String EXTRA_DATE = "com.example.taskplanner.date";
 
     public static DialogFragment newInstance() {
-        DatePickerFragment fragment = new DatePickerFragment();
-        return fragment;
+        return new DatePickerFragment();
     }
     @NonNull
     @Override
@@ -36,7 +35,7 @@ public class DatePickerFragment extends DialogFragment {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_date, null);
 
 
-        mDatePicker = (DatePicker) view.findViewById(R.id.dialog_date_picker);
+        mDatePicker = view.findViewById(R.id.dialog_date_picker);
 
 
 

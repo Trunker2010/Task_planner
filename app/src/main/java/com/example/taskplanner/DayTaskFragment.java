@@ -34,9 +34,6 @@ import java.util.GregorianCalendar;
 
 public class DayTaskFragment extends Fragment {
 
-    //public static final String DAY_TAG = "day_id";
-    public static final String EXTRA_DATE = "date";
-    private static final String EXTRA_DAY_ID = "day_id";
     RecyclerView mTaskRecyclerView;
     Day mDay;
 
@@ -57,7 +54,6 @@ public class DayTaskFragment extends Fragment {
         String dayId = String.valueOf(getActivity().getIntent().getIntExtra(DayTasksActivity.EXTRA_DAY_ID, 0));
         mDayLab = new DayLab(getContext());
         mDay = mDayLab.dbToDay(dayId);
-//        alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 
         mSharedPreferences = getContext().getSharedPreferences(SettingsActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
@@ -80,15 +76,12 @@ public class DayTaskFragment extends Fragment {
         dateTV.setText(mDay.getDate());
 
 
-        addTaskBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String task = String.valueOf(taskET.getText());
-                mDayLab.addTask(mDay, task);
-                updateRecyclerView();
-                mTaskRecyclerView.smoothScrollToPosition(mTasksList.size());
+        addTaskBTN.setOnClickListener(v1 -> {
+            String task = String.valueOf(taskET.getText());
+            mDayLab.addTask(mDay, task);
+            updateRecyclerView();
+            mTaskRecyclerView.smoothScrollToPosition(mTasksList.size());
 
-            }
         });
         taskET.addTextChangedListener(new TextWatcher() {
             @Override

@@ -16,6 +16,7 @@ public class DayBaseHelper extends SQLiteOpenHelper {
 
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + DayTable.NAME + "( " +

@@ -51,18 +51,13 @@ public class PageFragment extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
         FloatingActionButton FABAddDay = view.findViewById(R.id.fab);
         BottomAppBar bottomAppBar = view.findViewById(R.id.bottom_app_bar);
-        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.settings: {
-                        Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                        startActivity(intent);
-                        return true;
-                    }
-                    default: return true;
-                }
+        bottomAppBar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.settings) {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+                return true;
             }
+            return true;
         });
         FABAddDay.setOnClickListener(v -> {
             mDatePickerFragment.setTargetFragment(mDaysListFragment, DaysListFragment.REQUEST_DATE);
@@ -75,7 +70,7 @@ public class PageFragment extends Fragment {
 
     public class SampleFragmentPagerAdapter extends FragmentStatePagerAdapter {
         final int PAGE_COUNT = 2;
-        private String tabTitles[] = new String[]{"List", "Calendar"};
+        private final String[] tabTitles = new String[]{"List", "Calendar"};
 
         public SampleFragmentPagerAdapter(@NonNull FragmentManager fm, int behavior) {
             super(fm, behavior);
